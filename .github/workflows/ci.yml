@@ -51,4 +51,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: giuseppeleo2/mlops-demo-project:latest
+        tags: leonardofgrodrigues/mlops-demo-project:latest

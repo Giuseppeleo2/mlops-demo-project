@@ -3,4 +3,5 @@ def add(a: int, b: int) -> int:
 
 
 if __name__ == "__main__":
-    print(add(2, 3))
+    import uvicorn
+    uvicorn.run("app.api:app", host="0.0.0.0", port=8000, reload=False)

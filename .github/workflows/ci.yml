@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, staging ]
   pull_request:
 
 jobs:
@@ -52,3 +52,62 @@ jobs:
         context: .
         push: true
         tags: leonardofgrodrigues/mlops-demo-project:latest
+
+  load-test:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install dependencies
+      run: make install && pip install -r requirements-dev.txt
+
+    - name: Start FastAPI app
+      run: uvicorn app.api:app --host 0.0.0.0 --port 8000 &
+      shell: bash
+
+    - name: Wait for app to be ready
+      run: |
+        for i in $(seq 1 10); do
+          curl -sf http://localhost:8000/add?a=1&b=2 && break
+          sleep 1
+        done
+
+    - name: Run Locust load test
+      run: |
+        locust \
+          --headless \
+          --users 10 \
+          --spawn-rate 10 \
+          --run-time 10s \
+          --host http://localhost:8000 \
+          --locustfile tests/locustfile.py \
+          --csv /tmp/locust \
+          --exit-code-on-error 0
+
+    - name: Check failure rate
+      run: |
+        python - <<'EOF'
+        import csv, sys
+        with open("/tmp/locust_stats.csv") as f:
+            rows = list(csv.DictReader(f))
+        aggregated = next((r for r in rows if r["Name"] == "Aggregated"), None)
+        if aggregated is None:
+            print("No aggregated stats found")
+            sys.exit(1)
+        total = int(aggregated["Request Count"])
+        failures = int(aggregated["Failure Count"])
+        rate = failures / total if total > 0 else 0
+        print(f"Failure rate: {rate:.2%} ({failures}/{total})")
+        if rate > 0.01:
+            print("FAIL: failure rate exceeds 1%")
+            sys.exit(1)
+        print("PASS")
+        EOF

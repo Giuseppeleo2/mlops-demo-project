@@ -1,0 +1,11 @@
+.git
+.github
+*.egg-info
+__pycache__
+.pytest_cache
+tests/
+*.pyc
+.flake8
+Makefile
+README.md
+buildspec.yml

@@ -30,7 +30,7 @@ This is an early-stage MLOps demo project (end of chapter 1 of an MLOps book). T
 - `tests/test_main.py` — pytest tests importing from `app`
 - Package is installed in editable mode via `setup.py` so `from app.main import ...` works in tests
 
-## Code Style
+## Code Style -
 
 - Line length: 88 (black/flake8 aligned)
 - Formatting enforced by `black`; CI runs `flake8` and `pytest` on Python 3.9, 3.10, and 3.11

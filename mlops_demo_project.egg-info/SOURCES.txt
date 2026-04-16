@@ -1,0 +1,9 @@
+README.md
+setup.py
+app/__init__.py
+app/main.py
+mlops_demo_project.egg-info/PKG-INFO
+mlops_demo_project.egg-info/SOURCES.txt
+mlops_demo_project.egg-info/dependency_links.txt
+mlops_demo_project.egg-info/top_level.txt
+tests/test_main.py

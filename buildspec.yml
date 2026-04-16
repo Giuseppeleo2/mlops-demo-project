@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - make install
+
+  pre_build:
+    commands:
+      - make lint
+
+  build:
+    commands:
+      - make test
+
+reports:
+  pytest_reports:
+    files:
+      - "report.xml"
+    file-format: JUNITXML

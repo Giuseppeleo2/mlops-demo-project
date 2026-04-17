@@ -69,16 +69,15 @@ jobs:
     - name: Install dependencies
       run: make install && pip install -r requirements-dev.txt
 
+    - name: Check app import
+      run: python -c "from app.api import app; print('import ok')"
+
     - name: Start FastAPI app
       run: uvicorn app.api:app --host 0.0.0.0 --port 8000 &
       shell: bash
 
     - name: Wait for app to be ready
-      run: |
-        for i in $(seq 1 10); do
-          curl -sf http://localhost:8000/add?a=1&b=2 && break
-          sleep 1
-        done
+      run: curl --retry 5 --retry-delay 2 --retry-connrefused "http://localhost:8000/add?a=1&b=2"
 
     - name: Run Locust load test
       run: |
